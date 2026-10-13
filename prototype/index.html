@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>URL Shortener</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 560px; margin: 4rem auto; padding: 0 1rem; }
+    form { display: flex; gap: 0.5rem; }
+    input { flex: 1; padding: 0.6rem; font-size: 1rem; }
+    button { padding: 0.6rem 1rem; font-size: 1rem; cursor: pointer; }
+    #out { margin-top: 1rem; }
+    .error { color: #c00; }
+  </style>
+</head>
+<body>
+  <h1>URL Shortener</h1>
+  <form id="form">
+    <input id="url" type="url" placeholder="https://example.com/some/long/path" required>
+    <button>Shorten</button>
+  </form>
+  <div id="out"></div>
+
+  <script>
+    const form = document.getElementById("form");
+    const input = document.getElementById("url");
+    const out = document.getElementById("out");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      out.textContent = "";
+      const res = await fetch("/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: input.value }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        out.innerHTML = `<p class="error"></p>`;
+        out.firstChild.textContent = data.error;
+        return;
+      }
+      out.innerHTML = `<p>Short URL: <a target="_blank"></a> <button type="button">Copy</button></p>`;
+      const link = out.querySelector("a");
+      link.href = link.textContent = data.short;
+      out.querySelector("button").onclick = (ev) => {
+        navigator.clipboard.writeText(data.short);
+        ev.target.textContent = "Copied!";
+      };
+    });
+  </script>
+</body>
+</html>
