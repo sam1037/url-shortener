@@ -1,0 +1,1 @@
+this note contain what i learnt in this project
