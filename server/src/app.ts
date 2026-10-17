@@ -1,4 +1,5 @@
 import express, { type Express, type Request, type Response } from "express";
+import { linksRouter } from "./routes/links.route.js";
 
 export const app: Express = express();
 app.use(express.json());
@@ -23,3 +24,5 @@ app.post("/echo", (req, res) => {
   }
   res.status(200).json(req.body);
 });
+
+app.use(linksRouter);
