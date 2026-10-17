@@ -1,10 +1,8 @@
 import express, { type Express, type Request, type Response } from "express";
 
-const app: Express = express();
+export const app: Express = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-
-const port = 3000;
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
@@ -24,8 +22,4 @@ app.post("/echo", (req, res) => {
     });
   }
   res.status(200).json(req.body);
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
 });
