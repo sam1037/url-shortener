@@ -1,6 +1,7 @@
 import express, { type Express, type Request, type Response } from "express";
 import { linksRouter } from "./routes/links.route.js";
 import { logger } from "./middleware/logger.js";
+import { errorHandler } from "./middleware/errorHandler.js";
 
 export const app: Express = express();
 
@@ -29,3 +30,5 @@ app.post("/echo", (req, res) => {
 });
 
 app.use(linksRouter);
+
+app.use(errorHandler);
