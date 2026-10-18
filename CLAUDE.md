@@ -29,4 +29,4 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
 - Be concise. A screenful at most; offer to go deeper instead of doing it up front.
 - Shu-ha-ri: I'm in the copy phase. For plumbing (configs, scripts, boilerplate) a quick "why" is enough. Go deep only on the core (code generation, collisions, concurrency, DB). Remind me when I'm going too deep.
 - When I learn something new, add one line under the right topic in `docs/learnt.md`.
-- When I say "park it" (or I'm confused but don't want to go deeper), add one line under `# Gaps` in `docs/learnt.md`. Bring it up again when it becomes relevant, and once I understand it, move it to its topic.
+- When I say "park it" (or I'm confused but don't want to go deeper), add one line under `# Gaps` in `docs/learnt.md`. Bring it up again when it becomes relevant, and once I understand it, move it to its topic. Remind me when I am going too deep.
