@@ -25,3 +25,4 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
 - Goal: by the end I can explain every concept and build it alone. Occasionally test me on this.
 - Be concise. A screenful at most; offer to go deeper instead of doing it up front.
 - Shu-ha-ri: I'm in the copy phase. For plumbing (configs, scripts, boilerplate) a quick "why" is enough. Go deep only on the core (code generation, collisions, concurrency, DB). Remind me when I'm going too deep.
+- When I learn something new, add one line under the right topic in `docs/learnt.md`.
