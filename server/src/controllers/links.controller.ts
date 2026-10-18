@@ -9,12 +9,21 @@ export function getShortenURLStat(req: Request, res: Response){
     }
 
     // call service and return
-    const stats = linksService.getShortenURLStats(req.params.code);
+    const stats = linksService.getLinkStats(req.params.code);
     if (!stats) {
         return res.status(404).json({error: "ShortenURL not found"});
     }
     res.status(200).json({longURL: stats.longURL, clicks: stats.clicks})
 };
+
+function isValidUrl(s: string): boolean {
+  try {
+    const u = new URL(s);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 export function createShortenURL(req: Request, res: Response){
     // val body
@@ -26,8 +35,11 @@ export function createShortenURL(req: Request, res: Response){
     if (typeof longURL !== "string") {
         return res.status(400).json({ error: "URL to shorten should be a string" });
     }
+    if (!isValidUrl(longURL)) {
+        return res.status(400).json({ error: "URL invalid" });
+    }
 
-    const code = linksService.createCode(longURL);
+    const code = linksService.createLink(longURL);
     const shortenURL = config.baseUrl + '/' + code;
 
     res.status(201).json({shortenURL});
@@ -40,7 +52,7 @@ export function redirectShortenURL(req: Request, res: Response){
         return res.status(400).json({ error: "shortenURL is required" });
     }
 
-    const longURL = linksService.resolveRedirect(code);
+    const longURL = linksService.resolveLink(code);
     if (!longURL) {
         return res.status(404).json({error: "ShortenURL not found"});
     }

@@ -32,13 +32,13 @@ Content-Type: application/json
 
 ### Redirect: found → 302
 # @no-redirect
-GET {{base}}/abc123
+GET {{base}}/zFp3eW
 
 ### Redirect: unknown → 404
 GET {{base}}/missing
 
 ### Stat: found
-GET {{base}}/api/v1/abc123/stat
+GET {{base}}/api/v1/zFp3eW/stat
 
 ### Stat: unknown → 404
 GET {{base}}/api/v1/missing/stat
