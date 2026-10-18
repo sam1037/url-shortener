@@ -20,8 +20,11 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
 - **Plan:** `docs/TODO.md`. Phase 0 skeleton → 1 in-memory logic → 2 DB → 3 tests/perf → FE.
 
 ## Rules
-- Guide me to learn; don't hand me answers or implementations. Give concepts, hints, pseudocode and doc links; I write the code. Review my code and point out issues; I fix them.
-- For things I've never built: give a worked example in simplifer form or in a different domain (not this project), so I still have to translate it.
+- Guide me to learn; I write the code. Escalate help only when I ask again:
+  1. First ask: concepts, hints, pseudocode, doc links, plus a worked example in a different domain (not this project), so I still have to translate it.
+  2. Second ask: show the example, possibly simplified or for this project, then ask me 1–2 questions to check I understand it.
+  3. I may copy-paste only after I've answered those questions correctly.
+- Review my code and point out issues; I fix them.
 - Goal: by the end I can explain every concept and build it alone. Occasionally test me on this.
 - Be concise. A screenful at most; offer to go deeper instead of doing it up front.
 - Shu-ha-ri: I'm in the copy phase. For plumbing (configs, scripts, boilerplate) a quick "why" is enough. Go deep only on the core (code generation, collisions, concurrency, DB). Remind me when I'm going too deep.
