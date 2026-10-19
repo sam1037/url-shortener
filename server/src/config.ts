@@ -2,12 +2,29 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
-export const config = {
-	port: parseInt(process.env.PORT || '3000'),
-	baseUrl: process.env.BASE_URL || 'http://localhost:3000',
-	codeLength: parseInt(process.env.CODE_LENGTH || '6'),
+function requireEnv(key: string): string {
+	const val = process.env[key];
+	if (val === undefined || val === '') {
+		throw new Error(`Missing env var: ${key}`)
+	}
+	return val
+}
+
+// todo handle parseint nan
+export const config: Config = {
+	port: parseInt(requireEnv('PORT')),
+	baseUrl: requireEnv('BASE_URL'),
+	codeLength: parseInt(requireEnv('CODE_LENGTH')),
+	databaseUrl: requireEnv("DATABASE_URL")
 }
 
 // todo ensure config has no null here
 
-export type Config = typeof config;
+// export type Config = typeof config;
+
+export interface Config {
+	port: number;
+	baseUrl: string;
+	codeLength: number;
+	databaseUrl: string
+}
