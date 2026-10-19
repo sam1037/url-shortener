@@ -1,60 +1,64 @@
 import { generateCode } from "../utils/base62.js"
-import { inMemoryDb, type Link } from "../db/inMemoryMock.js"
 import { config } from "../config.js";
+import { pool } from "../db/index.js";
+import { isUniqueViolation } from "../db/error.js";
 
-// ? TODO more detailed type for the code, e..g limit its length
-// todo fix mock
+interface UrlStatRow {
+  long_url: string;
+  clicks: number;
+}
+
 // todo later add interface for stat?
-export function getLinkStats(code: string) : { longURL: string; clicks: number } | null {
-    const link = inMemoryDb.get(code);
-    if (!link) {
-        return null;
-    }
+export async function getLinkStats(code: string): Promise<{ longURL: string; clicks: number } | null> {
+    const result = await pool.query<UrlStatRow>(
+      'SELECT long_url, clicks FROM urls WHERE code = $1',
+      [code]
+    );
 
-    return {longURL: link.longURL, clicks: link.clicks};
+    const row = result.rows[0];
+	if (row === undefined) return null;
+
+    return {longURL: row.long_url, clicks: row.clicks};
 }
 
-function generateUniqueCode(maxTries: number): string {
-  for (let i = 0; i < maxTries; i++) {
-    const code = generateCode(config.codeLength);
-    if (!inMemoryDb.has(code)) return code;
-  }
-  throw new Error(`Failed to generate unique code after ${maxTries} tries`);
-}
 
 /**
  * Create shortenURL code and update db/ redis
  * @param longURL 
  * @returns 
  */
-export function createLink(longURL: string): string {
+export async function createLink(longURL: string): Promise<string> {
     const maxTries = 5
-    const code = generateUniqueCode(maxTries);
+	for (let i = 0; i < maxTries; i++) {
+		try {
+			const code = generateCode(config.codeLength);
+			await pool.query(
+				'INSERT INTO urls (code, long_url) VALUES ($1, $2)',
+				[code, longURL]
+			);
+			return code;
+		} catch (err) {
+			if (isUniqueViolation(err)) continue;
+			throw err;
+		}
+	}
 
-    // ? call an util?
-    const link: Link = {
-        longURL: longURL,
-        clicks: 0,
-        createdAt: new Date()
-    }
-    inMemoryDb.set(code, link);
-
-    return code;
+	throw new Error(`Failed to generate unique code after ${maxTries} tries`);
 }
 
 /**
  * return longURL, and increment click stat by 1
  */
-export function resolveLink(code: string): string | null {
-    // validate
-    const link = inMemoryDb.get(code);
-    if (!link) {
-        return null;
-    }
+// TODO use redis
+export async function resolveLink(code: string): Promise<string | null> {
+    const results = await pool.query<{long_url: string}>(
+		'UPDATE urls SET clicks = clicks + 1 WHERE code = $1 RETURNING long_url',
+		[code]
+	);
 
-    // inc
-    link.clicks += 1; //? 
-
-    // return 
-    return link.longURL
+	const longUrl = results.rows[0]?.long_url;
+	if (longUrl === undefined) {
+		return null;
+	}
+    return longUrl;
 }

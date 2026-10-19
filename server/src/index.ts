@@ -1,8 +1,10 @@
 import { app } from "./app.js";
 import { config } from "./config.js"
+import { checkDb, initSchema } from "./db/index.js";
 
-const port = config.port;
+await checkDb();
+await initSchema();
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`);
+app.listen(config.port, () => {
+  console.log(`Example app listening on port ${config.port}`);
 });

@@ -2,14 +2,14 @@ import type { Request, Response } from "express";
 import * as linksService from "../services/links.service.js";
 import { config } from "../config.js"
 
-export function getShortenURLStat(req: Request, res: Response){
+export async function getShortenURLStat(req: Request, res: Response){
     // validate input
     if (!req.params.code || typeof req.params.code !== "string") {
         return res.status(400).json({error: "Invalid shortenURL"});
     }
 
     // call service and return
-    const stats = linksService.getLinkStats(req.params.code);
+    const stats = await linksService.getLinkStats(req.params.code);
     if (!stats) {
         return res.status(404).json({error: "ShortenURL not found"});
     }
@@ -25,7 +25,7 @@ function isValidUrl(s: string): boolean {
   }
 }
 
-export function createShortenURL(req: Request, res: Response){
+export async function createShortenURL(req: Request, res: Response){
     // val body
     // ? zod now? how to ensure longURL is string?
     const longURL = req.body?.longURL;
@@ -39,20 +39,20 @@ export function createShortenURL(req: Request, res: Response){
         return res.status(400).json({ error: "URL invalid" });
     }
 
-    const code = linksService.createLink(longURL);
+    const code = await linksService.createLink(longURL);
     const shortenURL = config.baseUrl + '/' + code;
 
     res.status(201).json({shortenURL});
 };
 
 
-export function redirectShortenURL(req: Request, res: Response){
+export async function redirectShortenURL(req: Request, res: Response){
     const code = req.params?.code;
     if (!code || typeof code !== 'string') {
         return res.status(400).json({ error: "shortenURL is required" });
     }
 
-    const longURL = linksService.resolveLink(code);
+    const longURL = await linksService.resolveLink(code);
     if (!longURL) {
         return res.status(404).json({error: "ShortenURL not found"});
     }
