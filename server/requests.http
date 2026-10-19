@@ -10,7 +10,8 @@ GET {{base}}/health
 POST {{base}}/api/v1/shorten
 Content-Type: application/json
 
-{ "longURL": "https://example.com/some/long/path" }
+# { "longURL": "https://example.com/some/long/path" }
+{ "longURL": "https://www.google.com" }
 
 ### Shorten: missing longURL → 400
 POST {{base}}/api/v1/shorten
@@ -32,13 +33,13 @@ Content-Type: application/json
 
 ### Redirect: found → 302
 # @no-redirect
-GET {{base}}/zFp3eW
+GET {{base}}/Agfoz4
 
 ### Redirect: unknown → 404
 GET {{base}}/missing
 
 ### Stat: found
-GET {{base}}/api/v1/zFp3eW/stat
+GET {{base}}/api/v1/Agfoz4/stat
 
 ### Stat: unknown → 404
 GET {{base}}/api/v1/missing/stat
