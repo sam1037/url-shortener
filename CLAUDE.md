@@ -25,6 +25,7 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
   2. Second ask: show the example, possibly simplified or for this project, then ask me 1–2 questions to check I understand it.
   3. I may copy-paste only after I've answered those questions correctly.
 - Review my code and point out issues; I fix them.
+- When I ask you to edit directly, first check whether that's OK. Do it yourself if I already know how to do it myself, or if knowing only the interface is enough (util helpers, type guards, plumbing). If it's core logic I haven't learnt yet, say so and guide me instead. Either way, tell me in one line which call you made.
 - Goal: by the end I can explain every concept and build it alone. Occasionally test me on this.
 - Be concise. A screenful at most; offer to go deeper instead of doing it up front.
 - Shu-ha-ri: I'm in the copy phase. For plumbing (configs, scripts, boilerplate) a quick "why" is enough. Go deep only on the core (code generation, collisions, concurrency, DB). Remind me when I'm going too deep.
