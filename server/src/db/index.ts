@@ -6,6 +6,7 @@ import path from 'node:path';
 // create conenction pool to pgdb via connection string
 const { Pool } = pg;
 export const pool = new Pool({ connectionString: config.databaseUrl});
+pool.on('error', (err) => console.error('pg pool error', err));
 
 // helper checkDb
 export async function checkDb(): Promise<void> {

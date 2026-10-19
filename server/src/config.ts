@@ -18,10 +18,6 @@ export const config: Config = {
 	databaseUrl: requireEnv("DATABASE_URL")
 }
 
-// todo ensure config has no null here
-
-// export type Config = typeof config;
-
 export interface Config {
 	port: number;
 	baseUrl: string;

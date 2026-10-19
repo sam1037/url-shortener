@@ -1,5 +1,4 @@
 import { generateCode } from "../utils/base62.js"
-// import { inMemoryDb, type Link } from "../db/inMemoryMock.js"
 import { config } from "../config.js";
 import { pool } from "../db/index.js";
 import { isUniqueViolation } from "../db/error.js";
@@ -57,7 +56,6 @@ export async function resolveLink(code: string): Promise<string | null> {
 		[code]
 	);
 
-    // return 
 	const longUrl = results.rows[0]?.long_url;
 	if (longUrl === undefined) {
 		return null;
