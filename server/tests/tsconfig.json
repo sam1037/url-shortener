@@ -1,0 +1,12 @@
+{
+	// Type-checks tests (and src they import) without adding them to the build.
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
+		"rootDir": "..",
+		"noEmit": true,
+		"declaration": false,
+		"declarationMap": false,
+		"sourceMap": false
+	},
+	"include": [".", "../src"]
+}

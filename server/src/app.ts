@@ -2,10 +2,14 @@ import express, { type Express, type Request, type Response } from 'express';
 import { linksRouter } from './routes/links.route.js';
 import { logger } from './middleware/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
+import { generalLimiter, shortenLinkLimiter } from './middleware/rateLimit.js';
 
 export const app: Express = express();
 
 app.use(logger);
+app.use(generalLimiter);
+app.use('/api/v1/shorten', shortenLinkLimiter);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
