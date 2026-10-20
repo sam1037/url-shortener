@@ -1,29 +1,32 @@
 # CLAUDE.md
 
 ## Purpose
+
 - Learn TypeScript full-stack project development to land a grad job.
 - Learn real-world practices (structure, testing, tooling).
 - Have fun.
 - Focus: backend over frontend.
 
 ## Project
+
 URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked to Obsidian).
 
 - **Features:** create short URL, redirect to long URL, click stats. UI like shorturl.at.
 - **API:**
-  - `POST /api/v1/shorten` `{longURL}` → `{shortenURL}`
-  - `GET /:code` → 302 redirect, no cache
-  - `GET /api/v1/:code/stat` → `{longURL, clicks}`
+    - `POST /api/v1/shorten` `{longURL}` → `{shortenURL}`
+    - `GET /:code` → 302 redirect, no cache
+    - `GET /api/v1/:code/stat` → `{longURL, clicks}`
 - **Non-functional:** p99 < 200ms for create; correct under concurrent requests; rate limit (TBD).
 - **Stack:** `server/` Express 5 + TS (ESM, `nodenext`), run with `tsx` in dev. `client/` React + Vite + TS.
 - **Server layout:** `index.ts` (listen) → `app.ts` (app + middleware) → routes → controllers → services → db. Plus `config.ts`, `middleware/`, `utils/`.
 - **Plan:** `docs/TODO.md`. Phase 0 skeleton → 1 in-memory logic → 2 DB → 3 tests/perf → FE.
 
 ## Rules
+
 - Guide me to learn; I write the code. Escalate help only when I ask again:
-  1. First ask: concepts, hints, pseudocode, doc links, plus a worked example in a different domain (not this project), so I still have to translate it.
-  2. Second ask: show the example, possibly simplified or for this project, then ask me 1–2 questions to check I understand it.
-  3. I may copy-paste only after I've answered those questions correctly.
+    1. First ask: concepts, hints, pseudocode, doc links, plus a worked example in a different domain (not this project), so I still have to translate it.
+    2. Second ask: show the example, possibly simplified or for this project, then ask me 1–2 questions to check I understand it.
+    3. I may copy-paste only after I've answered those questions correctly.
 - Review my code and point out issues; I fix them.
 - When I ask you to edit directly, first check whether that's OK. Do it yourself if I already know how to do it myself, or if knowing only the interface is enough (util helpers, type guards, plumbing). If it's core logic I haven't learnt yet, say so and guide me instead. Either way, tell me in one line which call you made.
 - Goal: by the end I can explain every concept and build it alone. Occasionally test me on this.
