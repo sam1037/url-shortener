@@ -16,6 +16,12 @@ export const config: Config = {
 	baseUrl: requireEnv('BASE_URL'),
 	codeLength: parseInt(requireEnv('CODE_LENGTH')),
 	databaseUrl: requireEnv('DATABASE_URL'),
+	rateLimitWindowMs: parseInt(requireEnv('RATE_LIMIT_WINDOW_MS')),
+	rateLimitMax: parseInt(requireEnv('RATE_LIMIT_MAX')),
+	shortenRateLimitWindowMs: parseInt(
+		requireEnv('SHORTEN_RATE_LIMIT_WINDOW_MS'),
+	),
+	shortenRateLimitMax: parseInt(requireEnv('SHORTEN_RATE_LIMIT_MAX')),
 };
 
 export interface Config {
@@ -23,4 +29,8 @@ export interface Config {
 	baseUrl: string;
 	codeLength: number;
 	databaseUrl: string;
+	rateLimitWindowMs: number;
+	rateLimitMax: number;
+	shortenRateLimitWindowMs: number;
+	shortenRateLimitMax: number;
 }

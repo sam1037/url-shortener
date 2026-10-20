@@ -16,7 +16,7 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
     - `POST /api/v1/shorten` `{longURL}` → `{shortenURL}`
     - `GET /:code` → 302 redirect, no cache
     - `GET /api/v1/:code/stat` → `{longURL, clicks}`
-- **Non-functional:** p99 < 200ms for create; correct under concurrent requests; rate limit (TBD).
+- **Non-functional:** p99 < 200ms for create; correct under concurrent requests; rate limit per IP via `express-rate-limit`.
 - **Stack:** `server/` Express 5 + TS (ESM, `nodenext`), run with `tsx` in dev. `client/` React + Vite + TS.
 - **Server layout:** `index.ts` (listen) → `app.ts` (app + middleware) → routes → controllers → services → db. Plus `config.ts`, `middleware/`, `utils/`.
 - **Plan:** `docs/TODO.md`. Phase 0 skeleton → 1 in-memory logic → 2 DB → 3 tests/perf → FE.
@@ -32,5 +32,6 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
 - Goal: by the end I can explain every concept and build it alone. Occasionally test me on this.
 - Be concise. A screenful at most; offer to go deeper instead of doing it up front.
 - Shu-ha-ri: I'm in the copy phase. For plumbing (configs, scripts, boilerplate) a quick "why" is enough. Go deep only on the core (code generation, collisions, concurrency, DB). Remind me when I'm going too deep.
+- Non-core features (e.g. rate limiting) use a library and are treated as a black box for now. Learn how to use and tune them (what limit to pick and why), and at most the names of the main approaches (fixed window, sliding window, token bucket). Not their internals.
 - When I learn something new, add one line under the right topic in `docs/learnt.md`.
 - When I say "park it" (or I'm confused but don't want to go deeper), add one line under `# Gaps` in `docs/learnt.md`. Bring it up again when it becomes relevant, and once I understand it, move it to its topic. Remind me when I am going too deep.
