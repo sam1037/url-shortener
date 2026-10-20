@@ -13,7 +13,7 @@ function requireEnv(key: string): string {
 // todo handle parseint nan
 export const config: Config = {
 	port: parseInt(requireEnv('PORT')),
-	baseUrl: requireEnv('BASE_URL'),
+	baseUrl: requireEnv('PUBLIC_BASE_URL'),
 	codeLength: parseInt(requireEnv('CODE_LENGTH')),
 	databaseUrl: requireEnv('DATABASE_URL'),
 	rateLimitWindowMs: parseInt(requireEnv('RATE_LIMIT_WINDOW_MS')),
