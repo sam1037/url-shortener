@@ -50,15 +50,16 @@ export async function createLink(longURL: string): Promise<string> {
 /**
  * return longURL, and increment click stat by 1
  */
-// TODO measure speed change
 export async function resolveLink(code: string): Promise<string | null> {
 	// see if cache hit
 	const key = 'url:' + code;
 	let cached: string | null = null;
-	try {
-		cached = await redis.get(key);
-	} catch (err) {
-		console.error(`redis GET ${key} failed, falling back to DB`, err);
+	if (config.cacheEnabled) {
+		try {
+			cached = await redis.get(key);
+		} catch (err) {
+			console.error(`redis GET ${key} failed, falling back to DB`, err);
+		}
 	}
 	if (cached !== null) {
 		void pool
@@ -80,8 +81,10 @@ export async function resolveLink(code: string): Promise<string | null> {
 	if (longUrl === undefined) {
 		return null;
 	}
-	void redis
-		.set(key, longUrl, { EX: config.defaultTTL })
-		.catch((err) => console.error(`redis SET ${key} failed`, err));
+	if (config.cacheEnabled) {
+		void redis
+			.set(key, longUrl, { EX: config.defaultTTL })
+			.catch((err) => console.error(`redis SET ${key} failed`, err));
+	}
 	return longUrl;
 }

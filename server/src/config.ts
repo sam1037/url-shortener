@@ -18,6 +18,8 @@ export const config: Config = {
 	databaseUrl: requireEnv('DATABASE_URL'),
 	redisUrl: requireEnv('REDIS_URL'),
 	defaultTTL: parseInt(requireEnv('DEFAULT_TTL')), // seconds
+	// optional, on unless set to "false"; off lets benchmarks compare against Postgres only
+	cacheEnabled: process.env.CACHE_ENABLED !== 'false',
 	rateLimitWindowMs: parseInt(requireEnv('RATE_LIMIT_WINDOW_MS')),
 	rateLimitMax: parseInt(requireEnv('RATE_LIMIT_MAX')),
 	shortenRateLimitWindowMs: parseInt(
@@ -33,6 +35,7 @@ export interface Config {
 	databaseUrl: string;
 	redisUrl: string;
 	defaultTTL: number;
+	cacheEnabled: boolean;
 	rateLimitWindowMs: number;
 	rateLimitMax: number;
 	shortenRateLimitWindowMs: number;
