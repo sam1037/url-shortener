@@ -7,9 +7,11 @@
 		"test": "vitest run",
 		"test:watch": "vitest",
 		"dev": "tsx watch src/index.ts",
-		"check": "tsc --noEmit && tsc -p tests",
-		"build": "tsc",
-		"start": "node dist/index.js"
+		"check": "tsc --noEmit && tsc -p tests && tsc -p bench",
+		"build": "tsc && cp src/db/schema.sql dist/db/",
+		"start": "node dist/index.js",
+		"start:perf": "npm run build && node --env-file=.env.perf dist/index.js > /dev/null",
+		"bench": "tsx bench/redirect.bench.ts"
 	},
 	"keywords": [],
 	"author": "",
@@ -23,10 +25,12 @@
 		"redis": "^6.3.0"
 	},
 	"devDependencies": {
+		"@types/autocannon": "^7.12.7",
 		"@types/express": "^5.0.6",
 		"@types/node": "^26.6.5",
 		"@types/pg": "^8.23.1",
 		"@types/supertest": "^7.2.1",
+		"autocannon": "^8.0.0",
 		"supertest": "^7.3.1",
 		"tsx": "^4.23.15",
 		"typescript": "^7.0.2",
