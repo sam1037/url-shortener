@@ -3,3 +3,8 @@ root = true
 [*]
 indent_style = tab
 indent_size = 4
+
+# YAML forbids tabs for indentation
+[*.{yml,yaml}]
+indent_style = space
+indent_size = 2
