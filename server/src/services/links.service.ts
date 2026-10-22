@@ -50,7 +50,8 @@ export async function createLink(longURL: string): Promise<string> {
 /**
  * return longURL, and increment click stat by 1
  */
-// TODO use redis
+// TODO use redis to speed up
+// TODO measure speed change
 export async function resolveLink(code: string): Promise<string | null> {
 	const results = await pool.query<{ long_url: string }>(
 		'UPDATE urls SET clicks = clicks + 1 WHERE code = $1 RETURNING long_url',

@@ -26,6 +26,15 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      redis:
+        image: redis:8
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
 
     # replaces server/.env.test, which is gitignored
     env:
@@ -33,6 +42,7 @@ jobs:
       PUBLIC_BASE_URL: http://localhost:3000
       CODE_LENGTH: 6
       DATABASE_URL: postgres://shortener:ci_pw@localhost:5432/shortener_test
+      REDIS_URL: redis://localhost:6379/1
       RATE_LIMIT_WINDOW_MS: 60000
       RATE_LIMIT_MAX: 100000
       SHORTEN_RATE_LIMIT_WINDOW_MS: 60000
