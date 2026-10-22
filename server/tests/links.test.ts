@@ -78,7 +78,7 @@ describe('GET /api/v1/:code/stat', () => {
 	it('starts at 0 clicks and counts each redirect', async () => {
 		const code = await shorten('https://example.com/c');
 
-		let res = await request(server).get(`/api/v1/${code}/stat`);
+		const res = await request(server).get(`/api/v1/${code}/stat`);
 		expect(res.body).toEqual({
 			longURL: 'https://example.com/c',
 			clicks: 0,
@@ -87,8 +87,14 @@ describe('GET /api/v1/:code/stat', () => {
 		await request(server).get(`/${code}`);
 		await request(server).get(`/${code}`);
 
-		res = await request(server).get(`/api/v1/${code}/stat`);
-		expect(res.body.clicks).toBe(2);
+		// the 2nd redirect may be a cache hit, which counts its click
+		// fire-and-forget: retry until the count settles
+		await expect
+			.poll(async () => {
+				const stat = await request(server).get(`/api/v1/${code}/stat`);
+				return stat.body.clicks;
+			})
+			.toBe(2);
 	});
 
 	it('404 on unknown code', async () => {
