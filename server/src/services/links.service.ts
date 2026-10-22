@@ -2,13 +2,13 @@ import { generateCode } from '../utils/base62.js';
 import { config } from '../config.js';
 import { pool } from '../db/index.js';
 import { isUniqueViolation } from '../db/error.js';
+import { redis } from '../db/redis.js';
 
 interface UrlStatRow {
 	long_url: string;
 	clicks: number;
 }
 
-// todo later add interface for stat?
 export async function getLinkStats(
 	code: string,
 ): Promise<{ longURL: string; clicks: number } | null> {
@@ -50,9 +50,27 @@ export async function createLink(longURL: string): Promise<string> {
 /**
  * return longURL, and increment click stat by 1
  */
-// TODO use redis to speed up
 // TODO measure speed change
 export async function resolveLink(code: string): Promise<string | null> {
+	// see if cache hit
+	const key = 'url:' + code;
+	let cached: string | null = null;
+	try {
+		cached = await redis.get(key);
+	} catch (err) {
+		console.error(`redis GET ${key} failed, falling back to DB`, err);
+	}
+	if (cached !== null) {
+		void pool
+			.query('UPDATE urls SET clicks = clicks + 1 WHERE code = $1', [
+				code,
+			])
+			.catch((err) =>
+				console.error(`click count for ${code} not recorded`, err),
+			);
+		return cached;
+	}
+	// cache miss
 	const results = await pool.query<{ long_url: string }>(
 		'UPDATE urls SET clicks = clicks + 1 WHERE code = $1 RETURNING long_url',
 		[code],
@@ -62,5 +80,8 @@ export async function resolveLink(code: string): Promise<string | null> {
 	if (longUrl === undefined) {
 		return null;
 	}
+	void redis
+		.set(key, longUrl, { EX: config.defaultTTL })
+		.catch((err) => console.error(`redis SET ${key} failed`, err));
 	return longUrl;
 }

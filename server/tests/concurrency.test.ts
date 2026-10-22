@@ -89,7 +89,18 @@ describe('concurrent redirects', () => {
 			),
 		);
 
-		const stat = await request(server).get(`/api/v1/${code}/stat`);
-		expect(stat.body.clicks).toBe(N);
+		// cache hits count clicks fire-and-forget, so the last UPDATEs may
+		// land after the redirects return: retry until the count settles
+		await expect
+			.poll(
+				async () => {
+					const stat = await request(server).get(
+						`/api/v1/${code}/stat`,
+					);
+					return stat.body.clicks;
+				},
+				{ timeout: 5000 },
+			)
+			.toBe(N);
 	});
 });

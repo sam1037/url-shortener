@@ -17,6 +17,7 @@ export const config: Config = {
 	codeLength: parseInt(requireEnv('CODE_LENGTH')),
 	databaseUrl: requireEnv('DATABASE_URL'),
 	redisUrl: requireEnv('REDIS_URL'),
+	defaultTTL: parseInt(requireEnv('DEFAULT_TTL')), // seconds
 	rateLimitWindowMs: parseInt(requireEnv('RATE_LIMIT_WINDOW_MS')),
 	rateLimitMax: parseInt(requireEnv('RATE_LIMIT_MAX')),
 	shortenRateLimitWindowMs: parseInt(
@@ -31,6 +32,7 @@ export interface Config {
 	codeLength: number;
 	databaseUrl: string;
 	redisUrl: string;
+	defaultTTL: number;
 	rateLimitWindowMs: number;
 	rateLimitMax: number;
 	shortenRateLimitWindowMs: number;
