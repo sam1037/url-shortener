@@ -3,6 +3,8 @@ import { linksRouter } from './routes/links.route.js';
 import { logger } from './middleware/logger.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { generalLimiter, shortenLinkLimiter } from './middleware/rateLimit.js';
+import { checkDb } from './db/index.js';
+import { redis } from './db/redis.js';
 
 export const app: Express = express();
 
@@ -17,9 +19,21 @@ app.get('/', (req: Request, res: Response) => {
 	res.send('Hello World!');
 });
 
-app.get('/health', (_req: Request, res: Response) => {
-	res.json({
-		status: 'ok',
+// Postgres down → 503 (can't serve anything). Redis down → 200 "degraded"
+// (redirects still work from Postgres, just slower).
+app.get('/health', async (_req: Request, res: Response) => {
+	let db = true;
+	try {
+		await checkDb();
+	} catch {
+		db = false;
+	}
+	const cache = redis.isReady;
+
+	res.status(db ? 200 : 503).json({
+		status: !db ? 'down' : cache ? 'ok' : 'degraded',
+		db: db ? 'ok' : 'down',
+		redis: cache ? 'ok' : 'down',
 	});
 });
 

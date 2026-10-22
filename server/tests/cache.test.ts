@@ -107,3 +107,21 @@ describe('redirect cache', () => {
 		expect(res.headers.location).toBe('https://example.com/d');
 	});
 });
+
+describe('GET /health', () => {
+	it('200 ok when Postgres and Redis are up', async () => {
+		const res = await request(server).get('/health').expect(200);
+		expect(res.body).toEqual({ status: 'ok', db: 'ok', redis: 'ok' });
+	});
+
+	it('200 degraded when Redis is down (redirects still work)', async () => {
+		await redis.close();
+
+		const res = await request(server).get('/health').expect(200);
+		expect(res.body).toEqual({
+			status: 'degraded',
+			db: 'ok',
+			redis: 'down',
+		});
+	});
+});
