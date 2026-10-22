@@ -14,6 +14,8 @@ services:
   redis:
     restart: always
     image: redis:8
+    # cap memory; when full, evict the least recently used key (default is noeviction: writes fail)
+    command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
     ports:
       - '127.0.0.1:6379:6379'
 
