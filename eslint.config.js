@@ -24,6 +24,18 @@ export default defineConfig([
 		files: ['server/**/*.ts', '*.js'],
 		languageOptions: { globals: globals.node },
 	},
+	// type-aware rules need the TS compiler, so only enable them where there's a tsconfig
+	{
+		files: ['server/**/*.ts'],
+		ignores: ['server/vitest.config.ts'], // not in any tsconfig
+		languageOptions: {
+			parserOptions: { projectService: true },
+		},
+		rules: {
+			// un-awaited promise with no .catch: its rejection crashes Node
+			'@typescript-eslint/no-floating-promises': 'error',
+		},
+	},
 	// last: turns off rules that conflict with Prettier
 	prettier,
 ]);
