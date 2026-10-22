@@ -5,18 +5,22 @@ import { app } from '../src/app.js';
 import { config } from '../src/config.js';
 import { initSchema, pool } from '../src/db/index.js';
 import { codeFrom, listen } from './helpers.js';
+import { redis } from '../src/db/redis.js';
 
 let server: Server;
 
 beforeAll(async () => {
 	await initSchema();
+	await redis.connect();
 	server = await listen(app);
 });
 beforeEach(async () => {
 	await pool.query('TRUNCATE urls');
+	await redis.flushDb();
 });
 afterAll(async () => {
 	server.close();
+	await redis.close();
 	await pool.end();
 });
 
@@ -74,7 +78,7 @@ describe('GET /api/v1/:code/stat', () => {
 	it('starts at 0 clicks and counts each redirect', async () => {
 		const code = await shorten('https://example.com/c');
 
-		let res = await request(server).get(`/api/v1/${code}/stat`);
+		const res = await request(server).get(`/api/v1/${code}/stat`);
 		expect(res.body).toEqual({
 			longURL: 'https://example.com/c',
 			clicks: 0,
@@ -83,8 +87,14 @@ describe('GET /api/v1/:code/stat', () => {
 		await request(server).get(`/${code}`);
 		await request(server).get(`/${code}`);
 
-		res = await request(server).get(`/api/v1/${code}/stat`);
-		expect(res.body.clicks).toBe(2);
+		// the 2nd redirect may be a cache hit, which counts its click
+		// fire-and-forget: retry until the count settles
+		await expect
+			.poll(async () => {
+				const stat = await request(server).get(`/api/v1/${code}/stat`);
+				return stat.body.clicks;
+			})
+			.toBe(2);
 	});
 
 	it('404 on unknown code', async () => {

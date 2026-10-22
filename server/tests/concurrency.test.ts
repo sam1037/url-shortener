@@ -5,18 +5,22 @@ import { app } from '../src/app.js';
 import { config } from '../src/config.js';
 import { initSchema, pool } from '../src/db/index.js';
 import { codeFrom, listen } from './helpers.js';
+import { redis } from '../src/db/redis.js';
 
 let server: Server;
 
 beforeAll(async () => {
 	await initSchema();
+	await redis.connect();
 	server = await listen(app);
 });
 beforeEach(async () => {
 	await pool.query('TRUNCATE urls');
+	await redis.flushDb();
 });
 afterAll(async () => {
 	server.close();
+	await redis.close();
 	await pool.end();
 });
 
@@ -85,7 +89,18 @@ describe('concurrent redirects', () => {
 			),
 		);
 
-		const stat = await request(server).get(`/api/v1/${code}/stat`);
-		expect(stat.body.clicks).toBe(N);
+		// cache hits count clicks fire-and-forget, so the last UPDATEs may
+		// land after the redirects return: retry until the count settles
+		await expect
+			.poll(
+				async () => {
+					const stat = await request(server).get(
+						`/api/v1/${code}/stat`,
+					);
+					return stat.body.clicks;
+				},
+				{ timeout: 5000 },
+			)
+			.toBe(N);
 	});
 });

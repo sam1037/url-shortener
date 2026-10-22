@@ -1,15 +1,23 @@
 services:
-    postgres:
-        restart: always
-        image: postgres:18
-        volumes:
-            - pgdata:/var/lib/postgresql
-        ports:
-            - '127.0.0.1:5432:5432' # localhost only, not exposed to the LAN
-        environment:
-            POSTGRES_USER: ${POSTGRES_USER}
-            POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-            POSTGRES_DB: ${POSTGRES_DB}
+  postgres:
+    restart: always
+    image: postgres:18
+    volumes:
+      - pgdata:/var/lib/postgresql
+    ports:
+      - '127.0.0.1:5432:5432' # localhost only, not exposed to the LAN
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+
+  redis:
+    restart: always
+    image: redis:8
+    # cap memory; when full, evict the least recently used key (default is noeviction: writes fail)
+    command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
+    ports:
+      - '127.0.0.1:6379:6379'
 
 volumes:
-    pgdata:
+  pgdata:
