@@ -5,18 +5,22 @@ import { app } from '../src/app.js';
 import { config } from '../src/config.js';
 import { initSchema, pool } from '../src/db/index.js';
 import { codeFrom, listen } from './helpers.js';
+import { redis } from '../src/db/redis.js';
 
 let server: Server;
 
 beforeAll(async () => {
 	await initSchema();
+	await redis.connect();
 	server = await listen(app);
 });
 beforeEach(async () => {
 	await pool.query('TRUNCATE urls');
+	await redis.flushDb();
 });
 afterAll(async () => {
 	server.close();
+	await redis.close();
 	await pool.end();
 });
 

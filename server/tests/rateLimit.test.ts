@@ -10,16 +10,20 @@ const MAX = 5;
 process.env.SHORTEN_RATE_LIMIT_MAX = String(MAX);
 const { app } = await import('../src/app.js');
 const { initSchema, pool } = await import('../src/db/index.js');
+const { redis } = await import('../src/db/redis.js');
 
 let server: Server;
 
 beforeAll(async () => {
 	await initSchema();
+	await redis.connect();
 	await pool.query('TRUNCATE urls');
+	await redis.flushDb();
 	server = await listen(app);
 });
 afterAll(async () => {
 	server.close();
+	await redis.close();
 	await pool.end();
 });
 
