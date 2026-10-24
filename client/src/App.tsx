@@ -1,11 +1,15 @@
-import { CounterButton } from './components/CounterButton';
+import { Route, Routes } from 'react-router';
+import { HomePage } from './pages/HomePage';
+import { ResultPage } from './pages/Result';
+import { StatsPage } from './pages/StatsPage';
 
 function App() {
 	return (
-		<div>
-			<h1>hello world</h1>
-			<CounterButton />
-		</div>
+		<Routes>
+			<Route path="/" element={<HomePage />} />
+			<Route path="/result" element={<ResultPage />} />
+			<Route path="/:code/stat" element={<StatsPage />} />
+		</Routes>
 	);
 }
 
