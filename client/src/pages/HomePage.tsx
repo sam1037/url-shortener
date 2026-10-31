@@ -25,17 +25,19 @@ export function HomePage() {
 	return (
 		<div>
 			<h1>Paste the URL to be Shortened</h1>
-			<form onSubmit={handleSubmit}>
-				{/* todo add placeholder */}
+			<form className="row" onSubmit={handleSubmit}>
 				<input
+					type="url"
+					required
+					placeholder="https://example.com/a/very/long/link"
 					value={longURL}
 					onChange={(e) => setLongURL(e.target.value)}
 				/>
 				<button disabled={loading}>
-					{loading ? 'Shortening' : 'Shorten URL'}
+					{loading ? 'Shortening…' : 'Shorten URL'}
 				</button>
 			</form>
-			{error && <p>{error}</p>}
+			{error && <p className="error">{error}</p>}
 		</div>
 	);
 }

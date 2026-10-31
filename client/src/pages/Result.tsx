@@ -23,14 +23,16 @@ export function ResultPage() {
 	return (
 		<div>
 			<h1>Your shortened URL</h1>
-			<a href={shortenURL}>{shortenURL}</a>
-			<button onClick={handleCopy}>{copied ? 'Copied!' : 'Copy'}</button>
-			<p>
+			<div className="row">
+				<a className="short-link" href={shortenURL}>
+					{shortenURL}
+				</a>
+				<button onClick={handleCopy}>{copied ? 'Copied!' : 'Copy'}</button>
+			</div>
+			<nav className="links">
 				<Link to="/">Shorten another</Link>
-			</p>
-			<p>
-				<Link to={`/${code}/stat`}>View number of clicks</Link>
-			</p>
+				<Link to={`/${code}/stat`}>View clicks</Link>
+			</nav>
 		</div>
 	);
 }

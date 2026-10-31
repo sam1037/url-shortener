@@ -29,16 +29,18 @@ export function StatsPage() {
 		};
 	}, [code]);
 
-	if (error) return <p>{error}</p>;
-	if (urlStats === null) return <p>Loading…</p>;
+	if (error) return <p className="error">{error}</p>;
+	if (urlStats === null) return <p className="muted">Loading…</p>;
 	return (
 		<div>
-			<h1>Total URL Clicks</h1>
-			<a href={urlStats.longURL}>{code}</a>
-			<p>{`${urlStats.clicks}`}</p>
-			<p>
-				<Link to="/">Shorten another</Link>
+			<h1>Total clicks</h1>
+			<p className="big-number">{urlStats.clicks}</p>
+			<p className="muted">
+				<a href={urlStats.longURL}>{urlStats.longURL}</a>
 			</p>
+			<nav className="links">
+				<Link to="/">Shorten another</Link>
+			</nav>
 		</div>
 	);
 }
