@@ -27,7 +27,9 @@ export function ResultPage() {
 				<a className="short-link" href={shortenURL}>
 					{shortenURL}
 				</a>
-				<button onClick={handleCopy}>{copied ? 'Copied!' : 'Copy'}</button>
+				<button onClick={handleCopy}>
+					{copied ? 'Copied!' : 'Copy'}
+				</button>
 			</div>
 			<nav className="links">
 				<Link to="/">Shorten another</Link>
