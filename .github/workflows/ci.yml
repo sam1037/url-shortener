@@ -60,3 +60,5 @@ jobs:
       - run: npm run format:check
       - run: npm run check -w server
       - run: npm test -w server
+      - run: npm run check -w client
+      - run: npm run build -w client

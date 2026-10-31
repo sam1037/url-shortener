@@ -26,7 +26,7 @@ export default defineConfig([
 	},
 	// type-aware rules need the TS compiler, so only enable them where there's a tsconfig
 	{
-		files: ['server/**/*.ts'],
+		files: ['server/**/*.ts', 'client/**/*.{ts,tsx}'],
 		ignores: ['server/vitest.config.ts'], // not in any tsconfig
 		languageOptions: {
 			parserOptions: { projectService: true },
