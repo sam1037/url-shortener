@@ -2,24 +2,58 @@ Yet another URL Shortener.
 
 ## Features
 
-- shorten long URL
-- view total clicks of the shortened URL
-- concurrency safe, prevented lost update
+- Shorten a long URL
+- View total clicks of a shortened URL
+- Concurrency safe: no lost updates on click counts
 
 ## Tech stack
 
-Tech stack: Express, Typescript, Redis, PostgreSQL, React
+Express, TypeScript, Redis, PostgreSQL, React
 
 ## Development
 
-setup docker
+### Prerequisites
 
-env files
+- Node.js 24
+- Docker
 
-start backend  
-`cd server`  
-`npm run dev`
+### Setup
 
-start frontend  
-`cd client`  
-`npm run dev`
+1. Create env files from the examples, then fill in the values:
+
+    ```bash
+    cp .env.example .env
+    cp server/.env.example server/.env
+    cp client/.env.example client/.env
+    ```
+
+2. Start PostgreSQL and Redis (reads `POSTGRES_*` from the root `.env`):
+
+    ```bash
+    docker compose up -d
+    ```
+
+3. Install dependencies (npm workspaces: installs both `client` and `server`):
+
+    ```bash
+    npm install
+    ```
+
+### Run
+
+In two terminals:
+
+```bash
+cd server && npm run dev   # API on http://localhost:3000
+```
+
+```bash
+cd client && npm run dev   # UI on http://localhost:5173
+```
+
+### Test
+
+```bash
+cp server/.env.test.example server/.env.test
+cd server && npm test
+```
