@@ -19,5 +19,24 @@ services:
     ports:
       - '127.0.0.1:6379:6379'
 
+  server:
+    # restart: ?
+    # how to use server/dockerfile:
+    build:
+      context: .
+      dockerfile: server/Dockerfile
+      target: dev
+    env_file: server/.env
+    environment: # overrides values from env_file
+      DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
+      REDIS_URL: redis://redis:6379/0
+    ports:
+      - '127.0.0.1:3000:3000'
+    volumes:
+      - ./server/src:/app/server/src
+    depends_on:
+      - redis
+      - postgres
+
 volumes:
   pgdata:
