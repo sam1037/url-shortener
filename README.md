@@ -8,52 +8,69 @@ Yet another URL Shortener.
 
 ## Tech stack
 
-Express, TypeScript, Redis, PostgreSQL, React
+Express, TypeScript, Redis, PostgreSQL, React, nginx, Docker Compose
 
-## Development
+## Getting started
 
 ### Prerequisites
 
-- Node.js 24
 - Docker
 
 ### Setup
 
-1. Create env files from the examples, then fill in the values:
-
-    ```bash
-    cp .env.example .env
-    cp server/.env.example server/.env
-    cp client/.env.example client/.env
-    ```
-
-2. Start PostgreSQL and Redis (reads `POSTGRES_*` from the root `.env`):
-
-    ```bash
-    docker compose up -d
-    ```
-
-3. Install dependencies (npm workspaces: installs both `client` and `server`):
-
-    ```bash
-    npm install
-    ```
-
-### Run
-
-In two terminals:
+Create env files from the examples, then fill in the values:
 
 ```bash
-cd server && npm run dev   # API on http://localhost:3000
+cp .env.example .env
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 ```
+
+The root `.env` holds the `POSTGRES_*` values that compose reads.
+
+### Development
 
 ```bash
-cd client && npm run dev   # UI on http://localhost:5173
+docker compose up --build   # --build only on first run or after changing deps/Dockerfiles
 ```
 
-### Test
+- Frontend (Vite, hot reload): http://localhost:5173
+- Backend (Express, restarts on save): http://localhost:3000
+- Postgres `localhost:5432` and Redis `localhost:6379` are published for tests and tools.
+
+A plain `docker compose up` merges `compose.override.yaml` (dev) on top of `compose.yaml` (prod).
+
+### Production (local)
+
+```bash
+docker compose down
+docker compose -f compose.yaml up --build
+```
+
+- App: http://localhost:8080. nginx serves the React build and proxies `/api` and short links to Express.
+- Only nginx is published; Express, Postgres and Redis are reachable only inside the compose network.
+
+## Test and benchmark
+
+Tests and benchmarks run on the host (Docker networking would skew benchmark numbers), so install packages first. Start the dev stack so Postgres and Redis are up.
+
+```bash
+npm install
+```
+
+Tests:
 
 ```bash
 cp server/.env.test.example server/.env.test
 cd server && npm test
+```
+
+Benchmark (redirect path):
+
+```bash
+cp server/.env.perf.example server/.env.perf   # also has a one-time CREATE DATABASE step
+docker compose stop server client   # free port 3000; keep Postgres and Redis running
+cd server
+npm run start:perf   # terminal 1: builds and runs the server with .env.perf
+npm run bench        # terminal 2
 ```
