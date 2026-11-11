@@ -52,8 +52,6 @@ docker compose -f compose.yaml up --build
 
 ## Test and benchmark
 
-Tests and benchmarks run on the host (Docker networking would skew benchmark numbers), so install packages first. Start the dev stack so Postgres and Redis are up.
-
 ```bash
 npm install
 ```
