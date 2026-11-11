@@ -1,11 +1,11 @@
+# Base = prod. `docker compose -f compose.yaml up --build` runs this file alone.
+# Plain `docker compose up` also merges compose.override.yaml (dev) on top.
 services:
   postgres:
     restart: always
     image: postgres:18
     volumes:
       - pgdata:/var/lib/postgresql
-    ports:
-      - '127.0.0.1:5432:5432' # localhost only, not exposed to the LAN
     environment:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -16,40 +16,34 @@ services:
     image: redis:8
     # cap memory; when full, evict the least recently used key (default is noeviction: writes fail)
     command: redis-server --maxmemory 100mb --maxmemory-policy allkeys-lru
-    ports:
-      - '127.0.0.1:6379:6379'
 
   server:
-    # restart: ?
-    # how to use server/dockerfile:
+    restart: unless-stopped
+    image: url-shortener-server:prod
     build:
       context: .
       dockerfile: server/Dockerfile
-      target: dev
+      target: prod
     env_file: server/.env
     environment: # overrides values from env_file
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379/0
-    ports:
-      - '127.0.0.1:3000:3000'
-    volumes:
-      - ./server/src:/app/server/src
+      PUBLIC_BASE_URL: http://localhost:8080
+
+    # no ports: only nginx (client) is reachable from outside
     depends_on:
       - redis
       - postgres
 
   client:
+    restart: unless-stopped
+    image: url-shortener-client:prod # separate tag per target, so dev and prod builds don't overwrite each other
     build:
       context: .
       dockerfile: client/Dockerfile
-      target: dev
-    env_file: client/.env
-    environment:
-      - SERVER_BASE_URL=http://server:3000
+      target: prod
     ports:
-      - '127.0.0.1:5173:5173'
-    volumes:
-      - ./client/src:/app/client/src
+      - '127.0.0.1:8080:80'
     depends_on:
       - server
 
