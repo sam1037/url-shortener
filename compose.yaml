@@ -34,7 +34,7 @@ services:
     environment: # overrides values from env_file
       DATABASE_URL: postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       REDIS_URL: redis://redis:6379/0
-      PUBLIC_BASE_URL: http://localhost:8080
+      PUBLIC_BASE_URL: ${PUBLIC_BASE_URL:-http://localhost:8080}
 
     # no ports: only nginx (client) is reachable from outside
     depends_on:
@@ -51,7 +51,7 @@ services:
       dockerfile: client/Dockerfile
       target: prod
     ports:
-      - '127.0.0.1:8080:80'
+      - '${CLIENT_PUBLISH:-127.0.0.1:8080}:80'
     depends_on:
       - server
 
