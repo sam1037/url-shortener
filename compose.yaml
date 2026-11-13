@@ -25,7 +25,7 @@ services:
 
   server:
     restart: unless-stopped
-    image: url-shortener-server:prod
+    image: ${REGISTRY:-local}/url-shortener-server:${TAG:-prod}
     build:
       context: .
       dockerfile: server/Dockerfile
@@ -45,7 +45,7 @@ services:
 
   client:
     restart: unless-stopped
-    image: url-shortener-client:prod # separate tag per target, so dev and prod builds don't overwrite each other
+    image: ${REGISTRY:-local}/url-shortener-client:${TAG:-prod}
     build:
       context: .
       dockerfile: client/Dockerfile
