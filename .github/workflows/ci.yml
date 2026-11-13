@@ -62,3 +62,56 @@ jobs:
       - run: npm test -w server
       - run: npm run check -w client
       - run: npm run build -w client
+
+  # Merges to main only: build ARM images → push to ECR → pull and restart on EC2.
+  deploy:
+    needs: check # never deploy untested code
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04-arm # native ARM (free for public repos), matches t4g, no QEMU
+    concurrency: deploy # two quick merges deploy one after another, not at once
+    permissions:
+      id-token: write # lets the job request an OIDC token, exchanged for AWS creds
+      contents: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - id: ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push images (:sha and :latest)
+        env:
+          REGISTRY: ${{ steps.ecr.outputs.registry }}
+          TAG: ${{ github.sha }}
+        run: |
+          # compose refuses to parse if an env_file is missing; server/.env is gitignored
+          # and only needed at runtime, so an empty one is enough to build
+          touch server/.env
+          docker compose -f compose.yaml build server client
+          docker compose -f compose.yaml push server client
+          for svc in server client; do
+            docker tag  "$REGISTRY/url-shortener-$svc:$TAG" "$REGISTRY/url-shortener-$svc:latest"
+            docker push "$REGISTRY/url-shortener-$svc:latest"
+          done
+
+      - name: Deploy to EC2
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          HOST: ${{ secrets.EC2_HOST }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/ec2.pem
+          chmod 600 ~/.ssh/ec2.pem
+          ssh-keyscan -H "$HOST" >> ~/.ssh/known_hosts
+          SSH="ssh -i $HOME/.ssh/ec2.pem ubuntu@$HOST"
+          # keep the server's compose.yaml identical to the repo's
+          scp -i ~/.ssh/ec2.pem compose.yaml "ubuntu@$HOST:~/url-shortener/compose.yaml"
+          $SSH 'cd ~/url-shortener \
+            && docker compose -f compose.yaml pull server client \
+            && docker compose -f compose.yaml up -d --no-build \
+            && docker image prune -f'
