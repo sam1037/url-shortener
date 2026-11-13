@@ -57,7 +57,7 @@ export function HomePage() {
 				<input
 					type="url"
 					required
-					placeholder="http://localhost:3000/abc123"
+					placeholder={`${window.location.origin}/abc123`}
 					value={statsInput}
 					onChange={(e) => setStatsInput(e.target.value)}
 				/>
