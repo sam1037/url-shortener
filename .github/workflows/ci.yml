@@ -76,18 +76,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # TEMP debug: what GitHub's OIDC token actually claims, vs the IAM trust policy. Remove once deploy works.
-      - name: Debug OIDC claims
-        env:
-          ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
-        run: |
-          TOKEN=$(curl -sSf -H "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" \
-            "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=sts.amazonaws.com" | jq -r .value)
-          PAYLOAD=$(echo "$TOKEN" | cut -d. -f2 | tr '_-' '/+')
-          while [ $(( ${#PAYLOAD} % 4 )) -ne 0 ]; do PAYLOAD="$PAYLOAD="; done
-          echo "$PAYLOAD" | base64 -d | jq '{sub, aud, iss, repository, ref}'
-          echo "role name from secret: '${ROLE_ARN##*/}' (secret length ${#ROLE_ARN}, expected 54)"
-
+      # IAM trust policy must match the token's sub, which GitHub now sends with numeric IDs:
+      # repo:<owner>@<owner_id>/<repo>@<repo_id>:ref:refs/heads/main
       - uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
