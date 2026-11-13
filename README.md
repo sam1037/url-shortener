@@ -1,4 +1,4 @@
-Yet another URL Shortener.
+Yet another URL Shortener. Try it [here](https://urlshortener.sam1037.com)!
 
 ## Features
 
@@ -40,15 +40,15 @@ docker compose up --build   # --build only on first run or after changing deps/D
 
 A plain `docker compose up` merges `compose.override.yaml` (dev) on top of `compose.yaml` (prod).
 
-### Production (local)
+## Deployment
 
-```bash
-docker compose down
-docker compose -f compose.yaml up --build
-```
+Live at https://urlshortener.sam1037.com, on one AWS EC2 instance (ARM) running `compose.yaml`.
 
-- App: http://localhost:8080. nginx serves the React build and proxies `/api` and short links to Express.
-- Only nginx is published; Express, Postgres and Redis are reachable only inside the compose network.
+- nginx act as web server for static files, reverse proxy for backend
+- Only nginx is published (80 → 443 redirect, 443); Express, Postgres and Redis are reachable only inside the compose network.
+- CI/CD (`.github/workflows/ci.yml`): every PR runs lint, format, typecheck, tests and build. A merge to `main` also builds ARM images, pushes them to ECR and restarts the app on EC2 over SSH.
+
+Prod needs the SSL cert, so it doesn't run locally; use the dev setup above.
 
 ## Test and benchmark
 
