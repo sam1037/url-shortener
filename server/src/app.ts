@@ -8,6 +8,8 @@ import { redis } from './db/redis.js';
 
 export const app: Express = express();
 
+app.set('trust proxy', 1); // 1 hop: nginx. Real client IP comes from X-Forwarded-For
+
 app.use(logger);
 app.use(generalLimiter);
 app.use('/api/v1/shorten', shortenLinkLimiter);

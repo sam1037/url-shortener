@@ -1,4 +1,4 @@
-Yet another URL Shortener.
+Yet another URL Shortener. Try it [here](https://urlshortener.sam1037.com)!
 
 ## Features
 
@@ -8,52 +8,67 @@ Yet another URL Shortener.
 
 ## Tech stack
 
-Express, TypeScript, Redis, PostgreSQL, React
+Express, TypeScript, Redis, PostgreSQL, React, nginx, Docker Compose
 
-## Development
+## Getting started
 
 ### Prerequisites
 
-- Node.js 24
 - Docker
 
 ### Setup
 
-1. Create env files from the examples, then fill in the values:
-
-    ```bash
-    cp .env.example .env
-    cp server/.env.example server/.env
-    cp client/.env.example client/.env
-    ```
-
-2. Start PostgreSQL and Redis (reads `POSTGRES_*` from the root `.env`):
-
-    ```bash
-    docker compose up -d
-    ```
-
-3. Install dependencies (npm workspaces: installs both `client` and `server`):
-
-    ```bash
-    npm install
-    ```
-
-### Run
-
-In two terminals:
+Create env files from the examples, then fill in the values:
 
 ```bash
-cd server && npm run dev   # API on http://localhost:3000
+cp .env.example .env
+cp server/.env.example server/.env
+cp client/.env.example client/.env
 ```
+
+The root `.env` holds the `POSTGRES_*` values that compose reads.
+
+### Development
 
 ```bash
-cd client && npm run dev   # UI on http://localhost:5173
+docker compose up --build   # --build only on first run or after changing deps/Dockerfiles
 ```
 
-### Test
+- Frontend (Vite, hot reload): http://localhost:5173
+- Backend (Express, restarts on save): http://localhost:3000
+- Postgres `localhost:5432` and Redis `localhost:6379` are published for tests and tools.
+
+A plain `docker compose up` merges `compose.override.yaml` (dev) on top of `compose.yaml` (prod).
+
+## Deployment
+
+Live at https://urlshortener.sam1037.com, on one AWS EC2 instance (ARM) running `compose.yaml`.
+
+- nginx act as web server for static files, reverse proxy for backend
+- Only nginx is published (80 → 443 redirect, 443); Express, Postgres and Redis are reachable only inside the compose network.
+- CI/CD (`.github/workflows/ci.yml`): every PR runs lint, format, typecheck, tests and build. A merge to `main` also builds ARM images, pushes them to ECR and restarts the app on EC2 over SSH.
+
+Prod needs the SSL cert, so it doesn't run locally; use the dev setup above.
+
+## Test and benchmark
+
+```bash
+npm install
+```
+
+Tests:
 
 ```bash
 cp server/.env.test.example server/.env.test
 cd server && npm test
+```
+
+Benchmark (redirect path):
+
+```bash
+cp server/.env.perf.example server/.env.perf   # also has a one-time CREATE DATABASE step
+docker compose stop server client   # free port 3000; keep Postgres and Redis running
+cd server
+npm run start:perf   # terminal 1: builds and runs the server with .env.perf
+npm run bench        # terminal 2
 ```

@@ -41,4 +41,3 @@ URL shortener, localhost only for now. Spec and design notes: `docs/` (symlinked
 - When I learn something new, add one line under the right topic in `docs/learnt.md`.
 - When I say "park it" (or I'm confused but don't want to go deeper), add one line under `# Gaps` in `docs/learnt.md`. Bring it up again when it becomes relevant, and once I understand it, move it to its topic. Remind me when I am going too deep.
 - Session log: when I ask, or at a natural stopping point (end of session, after a milestone commit), write `docs/SESSION-LOGS/YYYY-MM-DD.md` (append if it exists). Keep it short: what got done, decisions and why, open questions, next step.
-- Commit as needed: once a step works and is verified (tests, lint, `tsc` pass), make a small commit on the current feature branch without asking. Don't commit to `main`, and don't push or open a PR unless I ask.
